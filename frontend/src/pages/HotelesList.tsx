@@ -14,7 +14,9 @@ export default function HotelesList() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Aquí agregamos confirmación antes de eliminar
   const onDelete = (id: number) => {
+    if (!window.confirm('¿Desea eliminar el registro?')) return; // Confirmación
     deleteHotel(id).then(() => {
       setHoteles(hoteles.filter(h => h.id !== id));
     });
