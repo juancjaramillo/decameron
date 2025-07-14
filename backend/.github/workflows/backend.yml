@@ -1,8 +1,17 @@
 name: CI Decameron API
-on: [push,pull_request]
+
+on:
+  push:
+    paths:
+      - 'backend/**'
+  pull_request:
+    paths:
+      - 'backend/**'
+
 jobs:
   test:
     runs-on: ubuntu-latest
+
     services:
       postgres:
         image: postgres:15
@@ -10,21 +19,43 @@ jobs:
           POSTGRES_DB: decameron
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-        ports: ['5432:5432']
+        ports:
+          - '5432:5432'
         options: >-
           --health-cmd="pg_isready -U postgres"
           --health-interval=10s --health-timeout=5s --health-retries=5
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: shivammathur/setup-php@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-      - run: composer install --no-interaction
-      - run: cp .env.example .env
-      - run: |
+
+      - name: Install dependencies
+        working-directory: backend
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Copy env file
+        working-directory: backend
+        run: cp .env.example .env
+
+      - name: Configure database env
+        working-directory: backend
+        run: |
           sed -i 's/DB_HOST=.*/DB_HOST=127.0.0.1/' .env
           sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=postgres/' .env
-      - run: php artisan key:generate
-      - run: php artisan migrate --seed
-      - run: php artisan test --coverage
+
+      - name: Generate application key
+        working-directory: backend
+        run: php artisan key:generate
+
+      - name: Run migrations & seed
+        working-directory: backend
+        run: php artisan migrate --force --seed
+
+      - name: Run tests
+        working-directory: backend
+        run: php artisan test --coverage
