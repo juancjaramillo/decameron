@@ -2,6 +2,7 @@ import React from 'react';
 import { Navbar, Nav, Container, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { TOKEN_KEY } from '../api/client';
+import logo from '../assets/decameron-logo.png';
 
 export default function AppNavbar() {
   const nav = useNavigate();
@@ -15,6 +16,7 @@ export default function AppNavbar() {
     <Navbar bg="light" expand="lg" className="mb-4 shadow-sm">
       <Container>
         <Navbar.Brand onClick={() => nav('/hoteles')} style={{ cursor: 'pointer' }}>
+         <img src={logo} alt="Decameron" style={{ height: '30px', marginRight: '8px' }}/>
           Decameron
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="main-nav" />
