@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -24,6 +23,8 @@ class HotelController extends Controller
     public function __construct(protected HotelServiceInterface $svc) {}
 
     /**
+     * Listar todos los hoteles
+     *
      * @OA\Get(
      *   path="/api/v1/hoteles",
      *   tags={"Hoteles"},
@@ -31,13 +32,23 @@ class HotelController extends Controller
      *   @OA\Response(
      *     response=200,
      *     description="Listado de hoteles",
-     *     @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Hotel"))
+     *     @OA\JsonContent(
+     *       type="object",
+     *       @OA\Property(
+     *         property="data",
+     *         type="array",
+     *         @OA\Items(ref="#/components/schemas/Hotel")
+     *       )
+     *     )
      *   )
      * )
      */
     public function index()
     {
-        return response()->json($this->svc->listar());
+        // Envolvemos la lista en "data" para que assertJsonCount('data') funcione
+        return response()->json([
+            'data' => $this->svc->listar(),
+        ], Response::HTTP_OK);
     }
 
     /**
@@ -65,9 +76,12 @@ class HotelController extends Controller
      *   )
      * )
      */
-    public function show($id)
+    public function show(int $id)
     {
-        return response()->json($this->svc->obtener((int)$id));
+        return response()->json(
+            $this->svc->obtener($id),
+            Response::HTTP_OK
+        );
     }
 
     /**
@@ -94,8 +108,11 @@ class HotelController extends Controller
      */
     public function store(StoreHotelRequest $req)
     {
-        return response()
-            ->json($this->svc->crear($req->validated()), Response::HTTP_CREATED);
+        $hotel = $this->svc->crear($req->validated());
+        return response()->json(
+            $hotel,
+            Response::HTTP_CREATED
+        );
     }
 
     /**
@@ -127,9 +144,12 @@ class HotelController extends Controller
      *   )
      * )
      */
-    public function update(StoreHotelRequest $req, $id)
+    public function update(StoreHotelRequest $req, int $id)
     {
-        return response()->json($this->svc->actualizar((int)$id, $req->validated()));
+        return response()->json(
+            $this->svc->actualizar($id, $req->validated()),
+            Response::HTTP_OK
+        );
     }
 
     /**
@@ -156,9 +176,9 @@ class HotelController extends Controller
      *   )
      * )
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
-        $this->svc->eliminar((int)$id);
+        $this->svc->eliminar($id);
         return response()->json(null, Response::HTTP_NO_CONTENT);
     }
 }

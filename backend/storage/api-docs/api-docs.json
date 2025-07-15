@@ -22,6 +22,7 @@
                     "Hoteles"
                 ],
                 "summary": "Listar todos los hoteles",
+                "description": "Listar todos los hoteles",
                 "operationId": "9eb12e05feff61ceccef81a04296b6c1",
                 "responses": {
                     "200": {
@@ -29,10 +30,15 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/Hotel"
-                                    }
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Hotel"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
