@@ -3,29 +3,36 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\User;
+use Laravel\Sanctum\Sanctum;
 
 class HotelTest extends TestCase
 {
-    use RefreshDatabase;
-
-    public function test_crea_y_lista_hoteles(): void
+    public function test_crea_y_lista_hoteles()
     {
-        // 1. Crear un hotel vía API
+        // 1) Creamos un usuario y autenticamos con Sanctum
+        Sanctum::actingAs(
+            User::factory()->create(),
+            ['*'] // scopes si usas
+        );
+
+        // 2) Datos para crear
         $data = [
             'nombre'           => 'Prueba',
-            'nit'              => '1-1',
-            'direccion'        => 'Calle',
+            'nit'              => '12345',
+            'direccion'        => 'Calle X',
             'ciudad'           => 'X',
             'max_habitaciones' => 10,
         ];
+
+        // 3) Crear hotel (ahora responde 201)
         $this->postJson('/api/v1/hoteles', $data)
              ->assertStatus(201)
              ->assertJsonFragment(['nombre' => 'Prueba']);
 
-        // 2. Listar hoteles vía API
+        // 4) Listar hoteles
         $this->getJson('/api/v1/hoteles')
              ->assertStatus(200)
-             ->assertJsonCount(1);
+             ->assertJsonCount(1, 'data');
     }
 }
