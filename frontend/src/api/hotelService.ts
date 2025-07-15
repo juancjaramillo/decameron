@@ -1,5 +1,5 @@
-// src/api/hotelService.ts
 import api from './client';
+import { AxiosResponse } from 'axios';
 
 export interface Hotel {
   id: number;
@@ -17,34 +17,43 @@ export interface Config {
   cantidad: number;
 }
 
-export function listHoteles() {
-  return api.get<Hotel[]>('/hoteles');
+// Interfaz para la respuesta listHoteles
+interface ListHotelesResponse {
+  data: Hotel[];
 }
 
-export function getHotel(id: number) {
+// Ahora listHoteles devuelve un wrapper con `data: Hotel[]`
+export function listHoteles(): Promise<AxiosResponse<ListHotelesResponse>> {
+  return api.get<ListHotelesResponse>('/hoteles');
+}
+
+export function getHotel(id: number): Promise<AxiosResponse<Hotel>> {
   return api.get<Hotel>(`/hoteles/${id}`);
 }
 
-export function createHotel(data: Partial<Hotel>) {
+export function createHotel(data: Partial<Hotel>): Promise<AxiosResponse<Hotel>> {
   return api.post<Hotel>('/hoteles', data);
 }
 
-export function updateHotel(id: number, data: Partial<Hotel>) {
+export function updateHotel(id: number, data: Partial<Hotel>): Promise<AxiosResponse<Hotel>> {
   return api.put<Hotel>(`/hoteles/${id}`, data);
 }
 
-export function deleteHotel(id: number) {
+export function deleteHotel(id: number): Promise<AxiosResponse<void>> {
   return api.delete<void>(`/hoteles/${id}`);
 }
 
-export function listConfigs(hotelId: number) {
+export function listConfigs(hotelId: number): Promise<AxiosResponse<Config[]>> {
   return api.get<Config[]>(`/hoteles/${hotelId}/configuraciones`);
 }
 
-export function createConfig(hotelId: number, data: Omit<Config,'id'>) {
+export function createConfig(
+  hotelId: number,
+  data: Omit<Config, 'id'>
+): Promise<AxiosResponse<Config>> {
   return api.post<Config>(`/hoteles/${hotelId}/configuraciones`, data);
 }
 
-export function deleteConfig(id: number) {
+export function deleteConfig(id: number): Promise<AxiosResponse<void>> {
   return api.delete<void>(`/configuraciones/${id}`);
 }

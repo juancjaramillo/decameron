@@ -10,19 +10,31 @@ export default function HotelesList() {
 
   useEffect(() => {
     listHoteles()
-      .then(res => setHoteles(res.data))
+      .then(res => {
+        // Extraemos el array real desde la propiedad `data`
+        setHoteles(res.data.data);
+      })
+      .catch(err => {
+        console.error('Error al listar hoteles', err);
+        setHoteles([]);
+      })
       .finally(() => setLoading(false));
   }, []);
 
-  // Aquí agregamos confirmación antes de eliminar
   const onDelete = (id: number) => {
-    if (!window.confirm('¿Desea eliminar el registro?')) return; // Confirmación
-    deleteHotel(id).then(() => {
-      setHoteles(hoteles.filter(h => h.id !== id));
-    });
+    if (!window.confirm('¿Desea eliminar el registro?')) return;
+    deleteHotel(id)
+      .then(() => setHoteles(prev => prev.filter(h => h.id !== id)))
+      .catch(err => console.error('Error al eliminar hotel', err));
   };
 
-  if (loading) return <Spinner animation="border" />;
+  if (loading) {
+    return (
+      <div className="text-center my-5">
+        <Spinner animation="border" />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -30,33 +42,46 @@ export default function HotelesList() {
         <h1>Hoteles</h1>
         <Button onClick={() => nav('/hoteles/crear')}>Crear Hotel</Button>
       </div>
-      <Table striped bordered hover responsive>
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Ciudad</th>
-            <th># Habitaciones</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {hoteles.map(h => (
-            <tr key={h.id}>
-              <td>{h.nombre}</td>
-              <td>{h.ciudad}</td>
-              <td>{h.max_habitaciones}</td>
-              <td>
-                <Button size="sm" onClick={() => nav(`/hoteles/${h.id}`)} className="me-2">
-                  Ver
-                </Button>
-                <Button size="sm" variant="danger" onClick={() => onDelete(h.id)}>
-                  Borrar
-                </Button>
-              </td>
+
+      {hoteles.length === 0 ? (
+        <p>No hay hoteles aún.</p>
+      ) : (
+        <Table striped bordered hover responsive>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Ciudad</th>
+              <th># Habitaciones</th>
+              <th>Acciones</th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
+          </thead>
+          <tbody>
+            {hoteles.map(h => (
+              <tr key={h.id}>
+                <td>{h.nombre}</td>
+                <td>{h.ciudad}</td>
+                <td>{h.max_habitaciones}</td>
+                <td>
+                  <Button
+                    size="sm"
+                    onClick={() => nav(`/hoteles/${h.id}`)}
+                    className="me-2"
+                  >
+                    Ver
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="danger"
+                    onClick={() => onDelete(h.id)}
+                  >
+                    Borrar
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      )}
     </>
   );
 }

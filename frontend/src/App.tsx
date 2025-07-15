@@ -1,3 +1,4 @@
+// src/App.tsx
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
@@ -10,24 +11,22 @@ import AppNavbar from './components/AppNavbar';
 import { TOKEN_KEY } from './api/client';
 
 function PrivateRoute() {
-  return localStorage.getItem(TOKEN_KEY)
-    ? <Outlet />
-    : <Navigate to="/login" replace />;
+  const token = localStorage.getItem(TOKEN_KEY);
+  return token ? <Outlet /> : <Navigate to="/login" replace />;
 }
 
 export default function App() {
   return (
     <BrowserRouter>
-      {/* Siempre mostramos la navbar, incluso si está en login */}
+      {/* Navbar siempre visible */}
       <AppNavbar />
 
-      {/* Centramos todo el contenido */}
       <Container className="py-4">
         <Routes>
           {/* Ruta pública */}
           <Route path="/login" element={<Login />} />
 
-          {/* Rutas privadas */}
+          {/* Rutas protegidas */}
           <Route element={<PrivateRoute />}>
             <Route index element={<Navigate to="/hoteles" replace />} />
             <Route path="hoteles" element={<HotelesList />} />
@@ -35,8 +34,11 @@ export default function App() {
             <Route path="hoteles/:hotelId" element={<HotelDetail />} />
           </Route>
 
-          {/* Cualquier otra, vuelve a login */}
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          {/* Cualquier otra ruta */}
+          <Route
+            path="*"
+            element={<Navigate to={localStorage.getItem(TOKEN_KEY) ? '/hoteles' : '/login'} replace />}
+          />
         </Routes>
       </Container>
     </BrowserRouter>
