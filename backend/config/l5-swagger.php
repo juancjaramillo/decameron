@@ -6,10 +6,11 @@ return [
     'documentations' => [
         'default' => [
             'api' => [
-                'title' => 'L5 Swagger UI',
+                'title' => 'Decameron API',
             ],
 
             'routes' => [
+                // Ruta donde sirve la documentación interactiva
                 'api' => 'api/documentation',
             ],
 
@@ -27,58 +28,57 @@ return [
     ],
 
     'defaults' => [
+        // Rutas para la UI y callbacks de OAuth
         'routes' => [
             'docs'            => 'docs',
             'oauth2_callback' => 'api/oauth2-callback',
             'middleware'      => [
-                'api'            => [],
-                'asset'          => [],
-                'docs'           => [],
-                'oauth2_callback'=> [],
+                'api'             => [],
+                'asset'           => [],
+                'docs'            => [],
+                'oauth2_callback' => [],
             ],
-            'group_options'   => [],
         ],
 
+        // Paths para almacenamiento y vistas
         'paths' => [
-            'docs'    => storage_path('api-docs'),
-            'views'   => base_path('resources/views/vendor/l5-swagger'),
-            'base'    => env('L5_SWAGGER_BASE_PATH', null),
-            'excludes'=> [],
+            'docs'     => storage_path('api-docs'),
+            'views'    => base_path('resources/views/vendor/l5-swagger'),
+            'base'     => env('L5_SWAGGER_BASE_PATH', null),
+            'excludes' => [],
         ],
 
-        'scanOptions' => [
-            'default_processors_configuration' => [],
-            'analyser'                        => null,
-            'analysis'                        => null,
-            'processors'                      => [],
-            'pattern'                         => null,
-            'exclude'                         => [],
-            'open_api_spec_version'           => env(
-                'L5_SWAGGER_OPEN_API_SPEC_VERSION',
-                \L5Swagger\Generator::OPEN_API_DEFAULT_SPEC_VERSION
-            ),
-        ],
+        // Proxy CORS y X-Forwarded headers
+        'proxy' => env('L5_SWAGGER_PROXY', false),
 
+        // Ordenación de operaciones en UI
+        'operations_sort' => env('L5_SWAGGER_OPERATIONS_SORT', null),
+
+        // URL adicional de configuración si se requiere (p.ej. remoto)
+        'additional_config_url' => env('L5_SWAGGER_ADDITIONAL_CONFIG_URL', null),
+
+        // URL del validador de Swagger (p.ej. nul para desactivar)
+        'validator_url' => env('L5_SWAGGER_VALIDATOR_URL', null),
+
+        // Definición de seguridad Bearer JWT
         'securityDefinitions' => [
             'securitySchemes' => [
-                'sanctum' => [
-                    'type'        => 'apiKey',
-                    'description' => 'Ingresar: Bearer {token}',
-                    'name'        => 'Authorization',
-                    'in'          => 'header',
+                'bearerAuth' => [
+                    'type'         => 'http',
+                    'scheme'       => 'bearer',
+                    'bearerFormat' => 'JWT',
+                    'description'  => 'Bearer {token}',
+                    'in'           => 'header',
+                    'name'         => 'Authorization',
                 ],
             ],
             'security' => [
-                ['sanctum' => []],
+                ['bearerAuth' => []],
             ],
         ],
 
         'generate_always'    => env('L5_SWAGGER_GENERATE_ALWAYS', false),
         'generate_yaml_copy' => env('L5_SWAGGER_GENERATE_YAML_COPY', false),
-        'proxy'              => false,
-        'additional_config_url' => null,
-        'operations_sort'    => env('L5_SWAGGER_OPERATIONS_SORT', null),
-        'validator_url'      => null,
 
         'ui' => [
             'display' => [
@@ -87,15 +87,13 @@ return [
                 'filter'       => env('L5_SWAGGER_UI_FILTERS', true),
             ],
             'authorization' => [
-                'persist_authorization' => env('L5_SWAGGER_UI_PERSIST_AUTHORIZATION', false),
-                'oauth2' => [
-                    'use_pkce_with_authorization_code_grant' => false,
-                ],
+                'persist_authorization' => env('L5_SWAGGER_UI_PERSIST_AUTHORIZATION', true),
             ],
         ],
 
+        // Forzar host único para Swagger
         'constants' => [
-            'L5_SWAGGER_CONST_HOST' => env('L5_SWAGGER_CONST_HOST', 'http://127.0.0.1:8000'),
+            'L5_SWAGGER_CONST_HOST' => env('L5_SWAGGER_CONST_HOST', 'http://localhost:8000'),
         ],
     ],
 ];

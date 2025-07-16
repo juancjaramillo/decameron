@@ -22,7 +22,6 @@
                     "Hoteles"
                 ],
                 "summary": "Listar todos los hoteles",
-                "description": "Listar todos los hoteles",
                 "operationId": "9eb12e05feff61ceccef81a04296b6c1",
                 "responses": {
                     "200": {
@@ -43,14 +42,18 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "post": {
                 "tags": [
                     "Hoteles"
                 ],
                 "summary": "Crea un hotel",
-                "description": "Crear un nuevo hotel",
                 "operationId": "dd3a81d374086615c76b9f80c5afb6bd",
                 "requestBody": {
                     "required": true,
@@ -76,7 +79,12 @@
                     "422": {
                         "description": "Validación fallida"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "servers": [
                 {
@@ -97,13 +105,11 @@
                     "Hoteles"
                 ],
                 "summary": "Obtiene un hotel por ID",
-                "description": "Obtener detalle de un hotel",
                 "operationId": "abb50a02958754cec9e05362220bd02f",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "ID del hotel",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -124,20 +130,23 @@
                     "404": {
                         "description": "Hotel no encontrado"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "put": {
                 "tags": [
                     "Hoteles"
                 ],
                 "summary": "Actualiza un hotel",
-                "description": "Actualizar un hotel existente",
                 "operationId": "8b245b0759a0f66b1076146d9a1456d5",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "ID del hotel",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -168,20 +177,23 @@
                     "404": {
                         "description": "Hotel no encontrado"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "delete": {
                 "tags": [
                     "Hoteles"
                 ],
                 "summary": "Elimina un hotel",
-                "description": "Eliminar un hotel",
                 "operationId": "02676ba05670bf0ed5752b9ec551eea1",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "ID del hotel",
                         "required": true,
                         "schema": {
                             "type": "integer"
@@ -195,7 +207,12 @@
                     "404": {
                         "description": "Hotel no encontrado"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/v1/hoteles/{hotelId}/configuraciones": {
@@ -416,11 +433,13 @@
             }
         },
         "securitySchemes": {
-            "sanctum": {
-                "type": "apiKey",
-                "description": "Ingresar: Bearer {token}",
-                "name": "Authorization",
-                "in": "header"
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "Bearer {token}",
+                "in": "header",
+                "name": "Authorization"
             }
         }
     },
@@ -436,7 +455,7 @@
     ],
     "security": [
         {
-            "sanctum": []
+            "bearerAuth": []
         }
     ]
 }

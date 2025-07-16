@@ -4,39 +4,77 @@ namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
+// Global HTTP middleware
+use Illuminate\Http\Middleware\HandleCors;
+use Illuminate\Http\Middleware\TrustProxies;
+use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
+use Illuminate\Foundation\Http\Middleware\ValidatePostSize;
+use Illuminate\Foundation\Http\Middleware\TrimStrings;
+use Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull;
+
+// “Web” middleware group
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+
+// Route‑specific middleware
+use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
+use App\Http\Middleware\EnsureEmailIsVerified;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Routing\Middleware\ValidateSignature;
+
 class Kernel extends HttpKernel
 {
+    /**
+     * Middleware global que se aplica a todas las peticiones HTTP.
+     *
+     * @var array<int, class-string|string>
+     */
+    protected $middleware = [
+        HandleCors::class,
+        TrustProxies::class,
+        PreventRequestsDuringMaintenance::class,
+        ValidatePostSize::class,
+        TrimStrings::class,
+        ConvertEmptyStringsToNull::class,
+    ];
+
+    /**
+     * Grupos de middleware para rutas “web” y “api”.
+     *
+     * @var array<string, array<int, class-string|string>>
+     */
     protected $middlewareGroups = [
         'web' => [
-            \Illuminate\Cookie\Middleware\EncryptCookies::class,
-            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-            \Illuminate\Session\Middleware\StartSession::class,
-            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            \App\Http\Middleware\VerifyCsrfToken::class,               // nuestro middleware
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            EncryptCookies::class,
+            AddQueuedCookiesToResponse::class,
+            StartSession::class,
+            ShareErrorsFromSession::class,
+            VerifyCsrfToken::class,
+            SubstituteBindings::class,
         ],
-
-       /* 'api' => [
-            // Aunque nuestro flujo es stateless, mantenemos este middleware para otras rutas si lo necesitaras.
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-            'throttle:api',
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        ],
-*/
 
         'api' => [
             'throttle:api',
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            SubstituteBindings::class,
         ],
-
     ];
 
+    /**
+     * Middleware asignables a rutas individualmente.
+     *
+     * @var array<string, class-string|string>
+     */
     protected $routeMiddleware = [
-        'auth'     => \Illuminate\Auth\Middleware\Authenticate::class,
-        'guest'    => \Illuminate\Auth\Middleware\RedirectIfAuthenticated::class,
-        'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
-        'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
-        'signed'   => \Illuminate\Routing\Middleware\ValidateSignature::class,
-        'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        'auth'     => Authenticate::class,
+        'guest'    => RedirectIfAuthenticated::class,
+        'verified' => EnsureEmailIsVerified::class,
+        'throttle' => ThrottleRequests::class,
+        'signed'   => ValidateSignature::class,
+        'bindings' => SubstituteBindings::class,
     ];
 }
